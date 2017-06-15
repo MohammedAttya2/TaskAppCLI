@@ -1,0 +1,25 @@
+#! /usr/bin/env php
+<?php
+
+use Symfony\Component\Console\Application;
+use Cli\ShowCommand;
+
+require_once 'vendor/autoload.php';
+
+try {
+    $pdo = new PDO('sqlite:db.sqlite');
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+} catch (Exeption $e){
+    echo 'Could not connect to Database';
+    exit(1);
+}
+
+$dbAdapter = new Cli\DatabaseAdapter($pdo);
+
+$app = new Application('Task App', '1.0');
+$app->add(new Cli\ShowCommand($dbAdapter));
+$app->add(new Cli\AddCommand($dbAdapter));
+$app->add(new Cli\CompleteCommand($dbAdapter));
+$app->run();
